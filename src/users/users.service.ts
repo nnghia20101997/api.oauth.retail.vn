@@ -17,6 +17,7 @@ export class UsersService {
   ) {}
 
   async register(usersRegisterDTO: UsersRegisterDTO): Promise<Users> {
+    console.log(usersRegisterDTO)
     let userRegistered: Users = await this.users.findOne({
       phone: usersRegisterDTO.phone,
     });
