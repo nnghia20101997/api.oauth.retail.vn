@@ -17,7 +17,20 @@ export class UsersService {
   ) {}
 
   async register(usersRegisterDTO: UsersRegisterDTO): Promise<Users> {
-    console.log(usersRegisterDTO)
+    let userRegistered: Users = await this.users.findOne({
+      phone: usersRegisterDTO.phone,
+    });
+
+    if (userRegistered) {
+      throw new HttpException(
+        new ExceptionResponseDetail(
+          HttpStatus.BAD_REQUEST,
+          'Số điện thoại đã được đăng ký !!!',
+        ),
+        HttpStatus.OK,
+      );
+    }
+
     usersRegisterDTO.password = await Password.bcryptPassword(
       usersRegisterDTO.password,
     );
@@ -39,28 +52,7 @@ export class UsersService {
       phone: usersLoginDTO.phone,
     });
 
-    if (user) {
-      // compare password
-      let isValid = await Password.comparePassword(
-        usersLoginDTO.password,
-        user.password,
-      );
-
-      if (isValid) {
-        let payload = {
-          phone: user.phone,
-        };
-        return { access_token: await this.jwtService.sign(payload) };
-      } else {
-        throw new HttpException(
-          new ExceptionResponseDetail(
-            HttpStatus.BAD_REQUEST,
-            'Sai mật khẩu !!!',
-          ),
-          HttpStatus.OK,
-        );
-      }
-    } else {
+    if (!user) {
       throw new HttpException(
         new ExceptionResponseDetail(
           HttpStatus.BAD_REQUEST,
@@ -69,5 +61,23 @@ export class UsersService {
         HttpStatus.OK,
       );
     }
+
+    // compare password
+    let isValid = await Password.comparePassword(
+      usersLoginDTO.password,
+      user.password,
+    );
+
+    if (!isValid) {
+      throw new HttpException(
+        new ExceptionResponseDetail(HttpStatus.BAD_REQUEST, 'Sai mật khẩu !!!'),
+        HttpStatus.OK,
+      );
+    }
+
+    let payload = {
+      phone: user.phone,
+    };
+    return { access_token: await this.jwtService.sign(payload) };
   }
 }
