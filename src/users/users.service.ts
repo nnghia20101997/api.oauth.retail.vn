@@ -17,6 +17,7 @@ export class UsersService {
   ) {}
 
   async register(usersRegisterDTO: UsersRegisterDTO): Promise<Users> {
+    console.log(usersRegisterDTO)
     usersRegisterDTO.password = await Password.bcryptPassword(
       usersRegisterDTO.password,
     );
