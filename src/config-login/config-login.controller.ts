@@ -5,7 +5,7 @@ import { ConfigLoginQueryDTO } from "./config-login.dto/config-login-query.dto";
 import { ConfigLogin } from "./config-login.entity/config-login.entity";
 import { ConfigLoginService } from "./config-login.service";
 
-@Controller("config-login")
+@Controller("/api/config-login")
 export class ConfigLoginController {
   constructor(private configLoginService: ConfigLoginService) {}
 

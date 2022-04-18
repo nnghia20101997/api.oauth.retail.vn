@@ -21,8 +21,9 @@ import { Response } from "express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { UsersParamsDTO } from "./users.dto/users.params.dto";
 import { VerifyCodeDTO } from "./users.dto/user.verify.dto";
+import { RequestHeaderVerifyApiKey } from "src/utils.common/utils.decorator.common/utils.decorator.common";
 
-@Controller("users")
+@Controller("/api/users")
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
@@ -42,7 +43,9 @@ export class UsersController {
 
   @Post("/login")
   async login(
-    @Body(new ValidationPipe()) usersLoginDTO: UsersLoginDTO,
+    @RequestHeaderVerifyApiKey("authorization")
+    @Body(new ValidationPipe())
+    usersLoginDTO: UsersLoginDTO,
     @Res() res: Response
   ): Promise<any> {
     let response: BaseResponseData = new BaseResponseData();
