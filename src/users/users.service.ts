@@ -96,18 +96,57 @@ export class UsersService {
   async verifyCode(verifyCodeDTO: VerifyCodeDTO): Promise<Users> {
     let user: Users = await this.users.findOne({
       phone: verifyCodeDTO.phone,
-      verify_code: verifyCodeDTO.verify_code,
     });
 
     if (!user) {
       throw new HttpException(
         new ExceptionResponseDetail(
           HttpStatus.UNAUTHORIZED,
-          "token không hợp lệ !!!"
+          "số điện thoại không đúng !!!"
         ),
         HttpStatus.OK
       );
     }
+
+    if (user.verify_fail_count > 3) {
+      throw new HttpException(
+        new ExceptionResponseDetail(
+          HttpStatus.UNAUTHORIZED,
+          "Vui lòng nhận mã xác thực mới !!!"
+        ),
+        HttpStatus.OK
+      );
+    }
+
+    if (user.verify_code != verifyCodeDTO.verify_code) {
+      await this.users.update(
+        {
+          phone: verifyCodeDTO.phone,
+        },
+        {
+          verify_fail_count: ++user.verify_fail_count,
+        }
+      );
+
+      throw new HttpException(
+        new ExceptionResponseDetail(
+          HttpStatus.UNAUTHORIZED,
+          "Mã xác thực không hợp lệ!!!"
+        ),
+        HttpStatus.OK
+      );
+    }
+
+    await this.users.update(
+      {
+        phone: verifyCodeDTO.phone,
+        verify_code: verifyCodeDTO.verify_code,
+      },
+      {
+        is_verified: 1,
+      }
+    );
+
     return user;
   }
 }

@@ -72,9 +72,8 @@ export class UsersController {
     @Res() res: Response,
     @Request() req
   ): Promise<any> {
-    let user: Users = await this.usersService.verifyCode(verifyCodeDTO);
-    return res
-      .status(200)
-      .send({ status: 200, message: "success", data: verifyCodeDTO });
+    let response: BaseResponseData = new BaseResponseData();
+    await this.usersService.verifyCode(verifyCodeDTO);
+    return res.status(HttpStatus.OK).send(response);
   }
 }
