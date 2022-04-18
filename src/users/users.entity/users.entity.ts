@@ -1,3 +1,4 @@
+import { Password } from "src/utils.common/utils.password.common/utils.password.common";
 import {
   BaseEntity,
   Column,
@@ -5,37 +6,38 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from 'typeorm';
+} from "typeorm";
+import { UsersRegisterDTO } from "../users.dto/users.register.dto";
 
 @Entity({
-  name: 'users',
+  name: "users",
 })
 export class Users extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   first_name: string;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   last_name: string;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   full_name: string;
 
   @Column({ default: 0 })
   gender: number;
 
-  @Column({ type: 'date' })
+  @Column({ type: "date" })
   birthday: Date;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   email: string;
 
   @Column({ default: 0 })
   is_expire: number;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   avatar: string;
 
   @Column({ default: 0 })
@@ -47,25 +49,25 @@ export class Users extends BaseEntity {
   @Column({ default: 0 })
   district_id: number;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   fb_uid: string;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   gg_uid: string;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   apple_uid: string;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   phone: string;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   password: string;
 
   @Column({ default: 0 })
   auth_type: number;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   verify_code: string;
 
   @Column({ default: 0 })
@@ -74,19 +76,19 @@ export class Users extends BaseEntity {
   @Column({ default: 0 })
   is_verified: number;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   access_token: string;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   refesh_token: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: "date" })
   last_activity_at: Date;
 
-  @Column({ type: 'date' })
+  @Column({ type: "date" })
   last_login_at: Date;
 
-  @Column({ type: 'date' })
+  @Column({ type: "date" })
   is_verify_code_at: Date;
 
   @CreateDateColumn()
@@ -94,4 +96,20 @@ export class Users extends BaseEntity {
 
   @UpdateDateColumn()
   created_at: Date;
+
+  constructor(usersRegisterDTO: UsersRegisterDTO) {
+    super();
+    this.password = usersRegisterDTO ? usersRegisterDTO.password : "";
+    this.first_name = usersRegisterDTO ? usersRegisterDTO.first_name : "";
+    this.last_name = usersRegisterDTO ? usersRegisterDTO.last_name : "";
+    this.gender = usersRegisterDTO ? +usersRegisterDTO.gender : 0;
+    this.phone = usersRegisterDTO ? usersRegisterDTO.phone : "";
+    this.verify_code = usersRegisterDTO
+      ? String(Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000)
+      : "";
+  }
+
+  public async setPassword(password: string) {
+    this.password = await Password.bcryptPassword(password);
+  }
 }
