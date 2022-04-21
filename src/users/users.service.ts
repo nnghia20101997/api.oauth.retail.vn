@@ -32,7 +32,7 @@ export class UsersService {
       );
     }
 
-    let newUserEntity = new Users(usersRegisterDTO);
+    let newUserEntity: Users = new Users(usersRegisterDTO);
 
     await newUserEntity.setPassword(usersRegisterDTO.password);
 
